@@ -5,6 +5,7 @@ using Microsoft.Bot.Connector;
 using Microsoft.Bot.Builder.Dialogs;
 using System.Net.Http;
 
+using System.Collections.Generic;
 
 namespace Microsoft.Bot.Sample.SimpleEchoBot
 {
@@ -21,9 +22,25 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
         private async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
-            var message = await argument;
+            //var message = await argument;
+            //await context.PostAsync(WelcomeMessage);
 
-            await context.PostAsync(WelcomeMessage);
+
+            var message = context.MakeMessage();
+            var actions = new List<CardAction>();
+
+            actions.Add(new CardAction() { Title = "1. Order", Value = "1", Type = ActionTypes.ImBack });
+            actions.Add(new CardAction() { Title = "2. FAQ", Value = "2", Type = ActionTypes.ImBack });
+
+            message.Attachments.Add(
+                new HeroCard
+                {
+                    Title="Select what you want",
+                    Buttons=actions
+                }.ToAttachment()
+            );
+
+            await context.PostAsync(message);
             context.Wait(SendWelcomeMessageAsync);
         }
 
@@ -34,12 +51,12 @@ namespace Microsoft.Bot.Sample.SimpleEchoBot
 
             if(selected == "1")
             {
-                await context.PostAsync("This is ordering food. please insert what you want to order");
+                //await context.PostAsync("This is ordering food. please insert what you want to order");
                 context.Call(new OrderDialog(), DialogResumeAfter);
             }
             else if(selected == "2")
             {
-                await context.PostAsync("This is FAQ. please insert your quesion.");
+                //await context.PostAsync("This is FAQ. please insert your quesion.");
                 context.Call(new OrderDialog(), DialogResumeAfter);
             }
             else
